@@ -3,7 +3,13 @@ import { useState } from 'react';
 const Dashboard = ({ leads, setLeads }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newLead, setNewLead] = useState({ name: '', company: '', status: 'New' });
+ const [newLead, setNewLead] = useState({
+  name: '',
+  company: '',
+  email: '',
+  phone: '',
+  status: 'New'
+});
   const [error, setError] = useState('');
 
   const filteredLeads = leads.filter(lead => 
@@ -106,6 +112,25 @@ const Dashboard = ({ leads, setLeads }) => {
               value={newLead.company}
               onChange={(e) => setNewLead({...newLead, company: e.target.value})}
             />
+
+       <input
+      className="w-full p-2 border border-slate-300 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+        placeholder="Email"
+        type="email"
+        value={newLead.email}
+        onChange={(e) =>
+         setNewLead({ ...newLead, email: e.target.value })
+          }
+         />
+
+         <input
+           className="w-full p-2 border border-slate-300 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+           placeholder="Phone Number"
+             value={newLead.phone}
+             onChange={(e) =>
+               setNewLead({ ...newLead, phone: e.target.value })
+             }
+           />
             
             <div className="flex justify-end gap-2 mt-2">
               <button 
@@ -119,14 +144,25 @@ const Dashboard = ({ leads, setLeads }) => {
               </button>
               <button 
                 onClick={() => { 
-                  if (!newLead.name.trim() || !newLead.company.trim()) {
-                    setError('Both Name and Company are required.');
-                    return; 
-                  }
+                  if (
+                   !newLead.name.trim() ||
+                   !newLead.company.trim() ||
+                   !newLead.email.trim() ||
+                   !newLead.phone.trim()
+                 ) {
+                 setError('All fields are required.');
+                      return;
+                 }                 
 
                   const leadToAdd = { ...newLead, id: Date.now() };
                   setLeads([...leads, leadToAdd]);
-                  setNewLead({ name: '', company: '', status: 'New' });
+                   setNewLead({
+                      name: '',
+                      company: '',
+                      email: '',
+                      phone: '',
+                      status: 'New'
+                    });                    
                   setError(''); 
                   setIsModalOpen(false); 
                 }} 

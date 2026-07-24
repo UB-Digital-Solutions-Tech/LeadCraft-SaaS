@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import axios from "axios";
 import companyLogo from '../assets/ULOGO.jpg'; // Make sure your logo is saved in src/assets/logo.png
 
 const Login = ({ onLogin }) => {
@@ -8,15 +9,30 @@ const Login = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (username === 'admin' && password === 'password') {
-      onLogin();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/login",
+      {
+        username,
+        password,
+      }
+    );
+
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+
+    onLogin();
+  } catch (error) {
+    if (error.response) {
+      setError(error.response.data.message);
     } else {
-      setError('Invalid credentials. Please use admin / password');
+      setError("Unable to connect to server");
     }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen flex bg-slate-950 font-sans">

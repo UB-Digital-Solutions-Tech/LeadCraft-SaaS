@@ -117,6 +117,8 @@ const AllLeads = ({ leads, setLeads }) => {
             <tr>
               <th className="p-4 font-semibold text-slate-700 text-sm">Name</th>
               <th className="p-4 font-semibold text-slate-700 text-sm">Company</th>
+              <th className="p-4 font-semibold text-slate-700 text-sm">Email</th>
+              <th className="p-4 font-semibold text-slate-700 text-sm">Phone</th>
               <th className="p-4 font-semibold text-slate-700 text-sm">Status</th>
               <th className="p-4 font-semibold text-slate-700 text-sm text-right">Actions</th>
             </tr>
@@ -133,6 +135,12 @@ const AllLeads = ({ leads, setLeads }) => {
                 <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 text-slate-800 font-medium whitespace-nowrap">{lead.name}</td>
                   <td className="p-4 text-slate-600 whitespace-nowrap">{lead.company}</td>
+                  <td className="p-4 text-slate-600 whitespace-nowrap">
+                   {lead.email}
+                   </td>
+                   <td className="p-4 text-slate-600 whitespace-nowrap">
+                   {lead.phone}
+                 </td>
                   <td className="p-4 whitespace-nowrap">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       lead.status === 'New' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 
@@ -210,6 +218,31 @@ const AllLeads = ({ leads, setLeads }) => {
               value={editingLead.company}
               onChange={(e) => setEditingLead({...editingLead, company: e.target.value})}
             />
+
+              <input
+            className="w-full p-2 border border-slate-300 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+            placeholder="Email"
+            value={editingLead.email}
+            onChange={(e)=>
+                setEditingLead({
+                    ...editingLead,
+                    email:e.target.value
+                })
+                    }
+              />  
+
+              <input
+               className="w-full p-2 border border-slate-300 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+              placeholder="Phone Number"
+             value={editingLead.phone}
+            onChange={(e)=>
+            setEditingLead({
+              ...editingLead,
+              phone:e.target.value
+             })
+            }
+           />
+
             <select 
               className="w-full p-2 border border-slate-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-slate-400"
               value={editingLead.status}
