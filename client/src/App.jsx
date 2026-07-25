@@ -1,15 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from "axios";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import AllLeads from './components/AllLeads';
 import Settings from './components/Settings';
 import Login from './components/Login';
-import { leads as initialLeads } from './data';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [leads, setLeads] = useState(initialLeads);
+  const [leads, setLeads] = useState([]);
+
+  const fetchLeads = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      "http://localhost:5000/api/leads",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setLeads(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(() => {
+  if (isAuthenticated) {
+    fetchLeads();
+  }
+}, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;

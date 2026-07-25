@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import axios from "axios";
 
 const AllLeads = ({ leads, setLeads }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,34 +31,82 @@ const AllLeads = ({ leads, setLeads }) => {
     setCurrentPage(1);
   };
 
-  const handleDelete = (id) => {
-    if(window.confirm("Are you sure you want to delete this lead?")) {
-      setLeads(leads.filter(lead => lead.id !== id));
-    }
-  };
-
-  const handleSaveEdit = () => {
-  if (
-    !editingLead.name.trim() ||
-    !editingLead.company.trim()
-  ) {
-    alert("Name and Company cannot be empty.");
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this lead?")) {
     return;
   }
 
-  setLeads(
-    leads.map((lead) =>
-      lead.id === editingLead.id ? editingLead : lead
-    )
-  );
+  try {
+    const token = localStorage.getItem("token");
 
-  setEditingLead(null);
+    await axios.delete(
+      `http://localhost:5000/api/leads/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setLeads(
+      leads.filter((lead) => lead._id !== id)
+    );
+
+  } catch (error) {
+    if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Unable to connect to server");
+    }
+  }
+};
+
+  const handleSaveEdit = async () => {
+  if (
+    !editingLead.name.trim() ||
+    !editingLead.company.trim() ||
+    !editingLead.email.trim() ||
+    !editingLead.phone.trim()
+  ) {
+    alert("All fields are required.");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.put(
+      `http://localhost:5000/api/leads/${editingLead._id}`,
+      editingLead,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setLeads(
+      leads.map((lead) =>
+        lead._id === editingLead._id ? response.data.lead : lead
+      )
+    );
+
+    setEditingLead(null);
+  } catch (error) {
+    if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Unable to connect to server");
+    }
+  }
 };
 
   const handleExportCSV = () => {
     if (filteredLeads.length === 0) return;
     const headers = ["ID,Name,Company,Status\n"];
-    const rows = filteredLeads.map(lead => `${lead.id},"${lead.name}","${lead.company}",${lead.status}\n`);
+    const rows = filteredLeads.map(
+  lead => `${lead._id},"${lead.name}","${lead.company}",${lead.status}\n`
+);
     const blob = new Blob(headers.concat(rows), { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -132,7 +181,7 @@ const AllLeads = ({ leads, setLeads }) => {
               </tr>
             ) : (
               currentLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={lead._id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 text-slate-800 font-medium whitespace-nowrap">{lead.name}</td>
                   <td className="p-4 text-slate-600 whitespace-nowrap">{lead.company}</td>
                   <td className="p-4 text-slate-600 whitespace-nowrap">
@@ -159,7 +208,7 @@ const AllLeads = ({ leads, setLeads }) => {
                         Edit
                       </button>
                       <button 
-                        onClick={() => handleDelete(lead.id)} 
+                        onClick={() => handleDelete(lead._id)} 
                         className="px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-100 hover:bg-red-200 rounded-md transition-colors border border-red-300 cursor-pointer"
                       >
                         Delete

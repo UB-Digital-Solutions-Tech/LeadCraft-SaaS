@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from "axios";
 
 const Dashboard = ({ leads, setLeads }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +12,50 @@ const Dashboard = ({ leads, setLeads }) => {
   status: 'New'
 });
   const [error, setError] = useState('');
+  const handleAddLead = async () => {
+  if (
+    !newLead.name.trim() ||
+    !newLead.company.trim() ||
+    !newLead.email.trim() ||
+    !newLead.phone.trim()
+  ) {
+    setError("All fields are required.");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+      "http://localhost:5000/api/leads",
+      newLead,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+   setLeads([...leads, response.data.lead]);
+
+    setNewLead({
+      name: "",
+      company: "",
+      email: "",
+      phone: "",
+      status: "New",
+    });
+
+    setError("");
+    setIsModalOpen(false);
+  } catch (error) {
+    if (error.response) {
+      setError(error.response.data.message);
+    } else {
+      setError("Unable to connect to server");
+    }
+  }
+};
 
   const filteredLeads = leads.filter(lead => 
     lead.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,7 +119,7 @@ const Dashboard = ({ leads, setLeads }) => {
               </tr>
             ) : (
               filteredLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={lead._id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 text-slate-800 font-medium">{lead.name}</td>
                   <td className="p-4 text-slate-600">{lead.company}</td>
                   <td className="p-4">
@@ -142,34 +187,12 @@ const Dashboard = ({ leads, setLeads }) => {
               >
                 Cancel
               </button>
-              <button 
-                onClick={() => { 
-                  if (
-                   !newLead.name.trim() ||
-                   !newLead.company.trim() ||
-                   !newLead.email.trim() ||
-                   !newLead.phone.trim()
-                 ) {
-                 setError('All fields are required.');
-                      return;
-                 }                 
-
-                  const leadToAdd = { ...newLead, id: Date.now() };
-                  setLeads([...leads, leadToAdd]);
-                   setNewLead({
-                      name: '',
-                      company: '',
-                      email: '',
-                      phone: '',
-                      status: 'New'
-                    });                    
-                  setError(''); 
-                  setIsModalOpen(false); 
-                }} 
+                <button
+               onClick={handleAddLead}
                 className="px-4 py-2 bg-slate-900 text-white rounded hover:bg-slate-800 font-medium"
-              >
-                Save
-              </button>
+               >
+  Save
+</button>
             </div>
           </div>
         </div>
