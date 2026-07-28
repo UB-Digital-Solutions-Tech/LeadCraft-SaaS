@@ -1,13 +1,43 @@
-
 const Lead = require("../models/Lead");
 
 const createLead = async (req, res) => {
   try {
+    if (req.user.role === "Sales Executive") {
+      return res.status(403).json({
+        message: "Sales Executives cannot add leads",
+      });
+    }
+
     const { name, company, email, phone, status } = req.body;
 
     if (!name || !company || !email || !phone) {
       return res.status(400).json({
         message: "All fields are required",
+      });
+    }
+
+    if (!/^\d{10}$/.test(phone)) {
+      return res.status(400).json({
+        message: "Phone number must contain exactly 10 digits",
+      });
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({
+        message: "Enter a valid email address",
+      });
+    }
+
+    const existingLead = await Lead.findOne({
+      $or: [{ email: email.toLowerCase() }, { phone }],
+    });
+
+    if (existingLead) {
+      return res.status(409).json({
+        message:
+          existingLead.email === email.toLowerCase()
+            ? "A lead with this email already exists"
+            : "A lead with this phone number already exists",
       });
     }
 
@@ -25,6 +55,11 @@ const createLead = async (req, res) => {
     });
 
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "A lead with this email or phone number already exists",
+      });
+    }
     res.status(500).json({
       message: error.message,
     });
@@ -45,9 +80,49 @@ const getAllLeads = async (req, res) => {
 
 const updateLead = async (req, res) => {
     try {
+        if (req.user.role === "Sales Executive") {
+            return res.status(403).json({
+                message: "Sales Executives cannot edit leads",
+            });
+        }
+
         const { id } = req.params;
 
         const { name, company, email, phone, status } = req.body;
+
+        if (!name || !company || !email || !phone) {
+            return res.status(400).json({
+                message: "All fields are required",
+            });
+        }
+
+        if (!/^\d{10}$/.test(phone)) {
+            return res.status(400).json({
+                message: "Phone number must contain exactly 10 digits",
+            });
+        }
+
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({
+                message: "Enter a valid email address",
+            });
+        }
+
+        // Exclude this lead's own _id, otherwise saving without changing
+        // email/phone would falsely flag itself as a duplicate.
+        const existingLead = await Lead.findOne({
+            _id: { $ne: id },
+            $or: [{ email: email.toLowerCase() }, { phone }],
+        });
+
+        if (existingLead) {
+            return res.status(409).json({
+                message:
+                    existingLead.email === email.toLowerCase()
+                        ? "Another lead with this email already exists"
+                        : "Another lead with this phone number already exists",
+            });
+        }
 
         const updatedLead = await Lead.findByIdAndUpdate(
             id,
@@ -76,6 +151,11 @@ const updateLead = async (req, res) => {
         });
 
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(409).json({
+                message: "A lead with this email or phone number already exists",
+            });
+        }
         res.status(500).json({
             message: error.message,
         });
@@ -84,6 +164,11 @@ const updateLead = async (req, res) => {
 
 const deleteLead = async (req, res) => {
     try {
+        if (req.user.role !== "Admin") {
+            return res.status(403).json({
+                message: "Only Admin can delete leads",
+            });
+        }
         const { id } = req.params;
 
         const deletedLead = await Lead.findByIdAndDelete(id);
@@ -105,9 +190,47 @@ const deleteLead = async (req, res) => {
     }
 };
 
+// Lightweight endpoint for the Kanban board drag-and-drop.
+// Only touches status, so a drag doesn't need to send/validate the whole lead.
+const updateLeadStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!["New", "Contacted", "Qualified"].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status value",
+            });
+        }
+
+        const updatedLead = await Lead.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedLead) {
+            return res.status(404).json({
+                message: "Lead not found",
+            });
+        }
+
+        res.status(200).json({
+            message: "Status updated successfully",
+            lead: updatedLead,
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
   createLead,
   getAllLeads,
   updateLead,
-   deleteLead,
+  deleteLead,
+  updateLeadStatus,
 };

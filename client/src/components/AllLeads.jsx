@@ -184,9 +184,14 @@ const AllLeads = ({ leads, setLeads }) => {
                 <tr key={lead._id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 text-slate-800 font-medium whitespace-nowrap">{lead.name}</td>
                   <td className="p-4 text-slate-600 whitespace-nowrap">{lead.company}</td>
-                  <td className="p-4 text-slate-600 whitespace-nowrap">
+                  <td className="p-4 whitespace-nowrap">
+                  <a
+                   href={`mailto:${lead.email}`}
+                   className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
                    {lead.email}
-                   </td>
+                   </a>
+                </td>
                    <td className="p-4 text-slate-600 whitespace-nowrap">
                    {lead.phone}
                  </td>

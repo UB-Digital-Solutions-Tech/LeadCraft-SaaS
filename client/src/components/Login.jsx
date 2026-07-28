@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import axios from "axios";
 import companyLogo from '../assets/ULOGO.jpg'; // Make sure your logo is saved in src/assets/logo.png
@@ -8,6 +7,7 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -23,6 +23,7 @@ const Login = ({ onLogin }) => {
 
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
+    
 
     onLogin();
   } catch (error) {
@@ -40,7 +41,7 @@ const Login = ({ onLogin }) => {
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative z-10">
+        <div className="relative z-10 mb-10">
           <div className="flex items-center gap-3">
             <img 
               src={companyLogo} 
@@ -60,19 +61,46 @@ const Login = ({ onLogin }) => {
           <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-6">
             Manage your customer leads efficiently.
           </h1>
-          <p className="text-slate-400 text-lg leading-relaxed">
+          <p className="text-slate-300 text-lg leading-relaxed mb-8">
             Track customer information, organize leads, monitor their progress, and streamline your sales workflow through a simple and intuitive CRM dashboard.
           </p>
+
+          {/* Feature highlights instead of fabricated stats */}
+          <div className="space-y-5 border-t border-slate-800 pt-6">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-white font-bold text-sm">Lead Tracking</div>
+                <div className="text-slate-400 text-xs mt-0.5">Never lose a prospect again</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-2.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-white font-bold text-sm">Team Collaboration</div>
+                <div className="text-slate-400 text-xs mt-0.5">Keep everyone in sync</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="relative z-10 text-slate-600 text-sm font-medium">
+        <div className="relative z-10 text-slate-500 text-sm font-medium mt-3">
           © 2026 Digital Solutions Inc. All rights reserved.
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gray-50">
-        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-slate-100">
-          <div className="text-center mb-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-4 sm:px-10 sm:py-6 bg-gray-50">
+        <div className="w-full max-w-lg bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100">
+          <div className="text-center mb-6">
             <div className="lg:hidden flex items-center justify-center gap-2 mb-6">
               <img 
                 src={companyLogo} 
@@ -84,15 +112,53 @@ const Login = ({ onLogin }) => {
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Welcome back</h2>
             <p className="text-slate-500 text-sm">Please enter your credentials to access your workspace</p>
           </div>
+           
+           {/* Demo Accounts */}
+<div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+  <div className="flex items-center gap-2 mb-3">
+    <span className="w-2 h-2 rounded-full bg-red-600"></span>
+    <h3 className="text-sm font-bold text-slate-800">
+      Demo Accounts
+    </h3>
+  </div>
 
-          <div className="mb-6 p-3 bg-red-50/60 border border-red-100 rounded-xl flex items-center justify-between text-xs text-red-900">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-              <span className="font-bold">Demo Access:</span>
-            </div>
-            <span className="font-mono bg-white px-2.5 py-1 rounded border border-red-200 text-slate-700 font-semibold">admin / password</span>
-          </div>
+  <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <table className="w-full text-sm">
+      <thead className="bg-slate-100 text-slate-700">
+        <tr>
+          <th className="px-3 py-2 text-left">Role</th>
+          <th className="px-3 py-2 text-left">Username</th>
+          <th className="px-3 py-2 text-left">Password</th>
+        </tr>
+      </thead>
 
+      <tbody>
+        <tr className="border-t">
+          <td className="px-3 py-2 font-semibold text-red-600">Administrator</td>
+          <td className="px-3 py-2 font-mono">admin</td>
+          <td className="px-3 py-2 font-mono">password</td>
+        </tr>
+
+        <tr className="border-t">
+          <td className="px-3 py-2 font-semibold text-red-600">Sales Manager</td>
+          <td className="px-3 py-2 font-mono">manager</td>
+          <td className="px-3 py-2 font-mono">password</td>
+        </tr>
+
+        <tr className="border-t">
+          <td className="px-3 py-2 font-semibold text-red-600">Sales Executive</td>
+          <td className="px-3 py-2 font-mono">executive</td>
+          <td className="px-3 py-2 font-mono">password</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p className="mt-3 text-xs text-slate-500">
+    Use these accounts to explore role-based permissions and CRM features.
+  </p>
+</div>
+        
           {error && (
             <div className="mb-6 p-3 bg-red-50 border-l-4 border-red-600 text-red-700 text-sm rounded-r flex items-center justify-between">
               <span className="font-medium">{error}</span>
@@ -100,7 +166,7 @@ const Login = ({ onLogin }) => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Username</label>
               <input
@@ -115,9 +181,6 @@ const Login = ({ onLogin }) => {
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-sm font-semibold text-slate-700">Password</label>
-                <a href="#forgot" onClick={(e) => e.preventDefault()} className="text-xs text-red-600 hover:text-red-700 font-semibold transition-colors">
-                  Forgot password?
-                </a>
               </div>
               <div className="relative">
                 <input
@@ -160,13 +223,13 @@ const Login = ({ onLogin }) => {
 
             <button
               type="submit"
-              className="w-full bg-slate-900 hover:bg-red-600 text-white py-3.5 px-4 rounded-xl font-bold shadow-lg shadow-slate-900/10 hover:shadow-red-600/25 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer text-sm tracking-wide"
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 px-4 rounded-xl font-bold shadow-lg shadow-red-600/25 hover:shadow-red-600/35 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer text-sm tracking-wide"
             >
               Sign In to Workspace →
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate-400 mt-8">
+          <p className="text-center text-xs text-slate-400 mt-3">
             Lead Management System • Built with React & Tailwind CSS
           </p>
         </div>

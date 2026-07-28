@@ -73,12 +73,14 @@ import { useState } from 'react';
             <h2 className="text-xl font-semibold text-slate-800 mb-4">Preferences</h2>
             <div className="flex items-center justify-between">
               <span className="text-slate-700 font-medium">Email Notifications</span>
-              <button 
+               <button 
                 type="button"
                 onClick={() => setNotifications(!notifications)}
-                className={`w-12 h-6 rounded-full transition-colors ${notifications ? 'bg-slate-900' : 'bg-slate-300'} relative cursor-pointer`}
+                className={`w-12 h-6 rounded-full transition-colors duration-200 ${notifications ? 'bg-slate-900' : 'bg-slate-300'} relative cursor-pointer appearance-none border-none focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 p-0`}
               >
-                <span className={`block w-4 h-4 bg-white rounded-full transition-transform ${notifications ? 'translate-x-7' : 'translate-x-1'} mt-1`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${notifications ? 'translate-x-6' : 'translate-x-0'}`}
+                />
               </button>
             </div>
           </div>
