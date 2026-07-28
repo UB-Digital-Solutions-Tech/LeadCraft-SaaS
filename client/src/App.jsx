@@ -19,7 +19,7 @@ function AppContent() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:5000/api/leads",
+        "https://leadcraft-saas.onrender.com/api/leads",
         {
           headers: {
             Authorization: `Bearer ${token}`,

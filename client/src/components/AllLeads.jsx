@@ -40,7 +40,7 @@ const AllLeads = ({ leads, setLeads }) => {
     const token = localStorage.getItem("token");
 
     await axios.delete(
-      `http://localhost:5000/api/leads/${id}`,
+      `https://leadcraft-saas.onrender.com/api/leads/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,7 +76,7 @@ const AllLeads = ({ leads, setLeads }) => {
     const token = localStorage.getItem("token");
 
     const response = await axios.put(
-      `http://localhost:5000/api/leads/${editingLead._id}`,
+      `https://leadcraft-saas.onrender.com/api/leads/${editingLead._id}`,
       editingLead,
       {
         headers: {
