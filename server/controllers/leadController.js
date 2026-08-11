@@ -227,10 +227,86 @@ const updateLeadStatus = async (req, res) => {
     }
 };
 
+const { parse } = require("csv-parse/sync");
+
+const importLeads = async (req, res) => {
+  try {
+    if (req.user.role === "Sales Executive") {
+      return res.status(403).json({
+        message: "Sales Executives cannot import leads",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No CSV file uploaded" });
+    }
+
+    const records = parse(req.file.buffer.toString("utf-8"), {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    });
+
+    let inserted = 0;
+    let skipped = 0;
+    const errors = [];
+
+    for (const row of records) {
+      const name = row.Name || row.name;
+      const company = row.Company || row.company;
+      const email = (row.Email || row.email || "").toLowerCase();
+      const phone = row.Phone || row.phone;
+      const status = row.Status || row.status || "New";
+
+      if (!name || !company || !email || !phone) {
+        skipped++;
+        errors.push(`Skipped row (missing fields): ${JSON.stringify(row)}`);
+        continue;
+      }
+      if (!/^\d{10}$/.test(phone)) {
+        skipped++;
+        errors.push(`Skipped ${email}: invalid phone number`);
+        continue;
+      }
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        skipped++;
+        errors.push(`Skipped row: invalid email "${email}"`);
+        continue;
+      }
+
+      const existingLead = await Lead.findOne({ $or: [{ email }, { phone }] });
+      if (existingLead) {
+        skipped++;
+        errors.push(`Skipped ${email}: already exists`);
+        continue;
+      }
+
+      await Lead.create({
+        name,
+        company,
+        email,
+        phone,
+        status: ["New", "Contacted", "Qualified"].includes(status) ? status : "New",
+      });
+      inserted++;
+    }
+
+    res.status(200).json({
+      message: `Import complete: ${inserted} added, ${skipped} skipped`,
+      inserted,
+      skipped,
+      errors,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createLead,
   getAllLeads,
   updateLead,
   deleteLead,
   updateLeadStatus,
+  importLeads,
 };

@@ -1,6 +1,7 @@
 
-import { useState } from 'react';
+import { useState ,useRef} from 'react';
 import axios from "axios";
+import toast from 'react-hot-toast';
 
 const AllLeads = ({ leads, setLeads }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -117,6 +118,40 @@ const AllLeads = ({ leads, setLeads }) => {
     document.body.removeChild(link);
   };
 
+  const fileInputRef = useRef(null);
+
+const handleImportClick = () => fileInputRef.current?.click();
+
+const handleImportCSV = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(
+      "https://leadcraft-saas.onrender.com/api/leads/import",
+      formData,
+      { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
+    );
+
+    // refresh the list after import
+    const refreshed = await axios.get(
+      "https://leadcraft-saas.onrender.com/api/leads",
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setLeads(refreshed.data);
+
+    toast.success(response.data.message);
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Import failed");
+  } finally {
+    e.target.value = "";
+  }
+};
+
   return (
     <div className="flex-1 p-4 md:p-8 bg-gray-50 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -124,12 +159,19 @@ const AllLeads = ({ leads, setLeads }) => {
         <button 
           onClick={handleExportCSV}
           disabled={filteredLeads.length === 0}
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 cursor-pointer text-sm"
+          className="ml-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 cursor-pointer text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           Export CSV
+        </button>
+        <input type="file" accept=".csv" ref={fileInputRef} onChange={handleImportCSV} className="hidden" />
+         <button
+           onClick={handleImportClick}
+            className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 cursor-pointer text-sm"
+          >
+            Import CSV
         </button>
       </div>
 

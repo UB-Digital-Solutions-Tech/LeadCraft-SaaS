@@ -53,7 +53,7 @@ const KanbanBoard = ({ leads, setLeads }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.patch(
-        `http://localhost:5000/api/leads/${draggableId}/status`,
+       `https://leadcraft-saas.onrender.com/api/leads/${draggableId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
